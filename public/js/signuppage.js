@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function(event) {
     const loginUrl = '/login-api/signup';
 
+    const fullName = document.getElementById('fullName');
     const userName = document.getElementById('username');
     const passWord = document.getElementById('password') ;
     const singup = document.getElementById('singup');
@@ -11,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         event.preventDefault();
 
         let formData = new FormData();
+        formData.append('fullName', fullName.value);
         formData.append('username', userName.value);
         formData.append('password', passWord.value);
 
@@ -28,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     growlBody.appendChild(text);
                     growl.appendChild(growlBody);
                     setTimeout(() => {
+                        growl.innerHTML = '';
                         window.location = '/login'
                     }, 2*1000);
                 } else {

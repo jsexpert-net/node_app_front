@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <a href="#postModalComment" class="boa" data-toggle="modal" for="comment" data-id="${post._id}">
                     <button class="cg nz ok" data-id="${post._id}" for="comment" title="Оставить комментарий">Оставить комментарий</button>
                 </a>
-                <button type="button" class="close" aria-hidden="true" title="Удалить"><span class="h bbg"></span></button>
+                <button type="button" class="close" aria-hidden="true" title="Удалить" data-id="${post._id}" for="delete"><span data-id="${post._id}" for="delete" class="h bbg"></span></button>
                 <hr>
                 <ul class="bow afa commentBlock" id="comment-${post._id}">
                 </ul>
@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 </p>
     
                 <div class="boy" data-grid="images"><img style="display: inline-block; width: 346px; height: 335px; margin-bottom: 10px; margin-right: 0px; vertical-align: bottom;" data-width="640" data-height="640" data-action="zoom" src="${post.picture}"></div>
-                <a href="#postModalComment" class="boa" data-toggle="modal" for="comment" data-id="${post._id}">
+                <a href="#postModalComment" class="boa" data-toggle="modal">
                     <button class="cg nz ok" data-id="${post._id}" for="comment" title="Оставить комментарий">Оставить комментарий</button>
                 </a>
                 <hr>
@@ -181,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function initListeners() {
         createPost.addEventListener('click', createPostListener);
         feed.addEventListener('click', editPostListener);
+        feed.addEventListener('click', deletePostListener);
         feed.addEventListener('click', publishCommentListener);
         feed.addEventListener('click', editCommentListener);
         feed.addEventListener('click', deleteCommentListener);
@@ -255,6 +256,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 postPublishEdit.addEventListener('click', publishHandler);
             })
+    }
+
+    function deletePostListener(event) {
+        if (!event.target.getAttribute("data-id") || event.target.getAttribute('for') !== 'delete') {
+            return;
+        }
+        const id = event.target.getAttribute("data-id");
+
+        const apiToken = localStorage.getItem('token');
+        const headers = new Headers();
+        headers.append('Authorization', apiToken);
+
+        fetch(`${postsUrl}/${id}`, {method: 'DELETE', headers: headers})
+            .then(response => {
+                if (response.status === 403) window.location = '/login';
+                return response;
+            })
+            .then(() => init())
     }
 
     function editCommentListener(event) {
