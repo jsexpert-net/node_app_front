@@ -82,3 +82,11 @@ strong {
 .commentBlock {
   padding-top: 20px;
 }
+
+.hide {
+  display: none;
+}
+
+#logout:before {
+  content: "\EAEB";
+}

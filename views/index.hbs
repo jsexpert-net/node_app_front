@@ -41,7 +41,7 @@
 </head>
 
 
-<body class="bob">
+<body class="bob hide" id="body">
 
 
 <div class="bon" id="app-growl"></div>
@@ -85,7 +85,7 @@
                 <a class="pg" data-action="growl">Growl</a>
             </li>
             <li class="pi vm">
-                <a class="pg" href="/login">Logout</a>
+                <a class="pg" href="#" id="logout">Logout</a>
             </li>
 
         </ul>
@@ -100,16 +100,21 @@
                     <span class="h azy"></span>
                 </a>
             </li>
-            <li class="pi afb">
-                <button class="cg bpo bpp boi" data-toggle="popover">
-                    <img class="us" src="/assets/img/avatar-dhg.png">
-                </button>
+            <!--<li class="pi afb">-->
+                <!--<button class="cg bpo bpp boi" data-toggle="popover">-->
+                    <!--<img class="us" src="/assets/img/avatar-dhg.png">-->
+                <!--</button>-->
+            <!--</li>-->
+            <li class="pi" id="logout-box">
+                <a class="g pg" href="#">
+                    <span class="h azy" id="logout"></span>
+                </a>
             </li>
         </ul>
 
         <ul class="nav navbar-nav d-none" id="js-popoverContent">
             <li class="pi"><a class="pg" href="#" data-action="growl">Growl</a></li>
-            <li class="pi"><a class="pg" href="/login">Logout</a></li>
+            <li class="pi"><a class="pg" href="#">Logout</a></li>
         </ul>
     </div>
 </nav>
@@ -489,7 +494,7 @@
     </div>
 </div>
 
-<div class="by aha ahl">
+<div class="by aha ahl" >
     <div class="dp">
         <div class="fj">
             <div class="pz bpi afo">
@@ -683,7 +688,7 @@
 <script src="/assets/js/popper.min.js"></script>
 <script src="/assets/js/chart.js"></script>
 <script src="/assets/js/toolkit.js"></script>
-<script src="/assets/js/application.js"></script>
+<!--<script src="/assets/js/application.js"></script>-->
 <script src="/js/homepage.js"></script>
 <script>
     // execute/clear BS loaders for docs

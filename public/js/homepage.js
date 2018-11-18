@@ -1,8 +1,9 @@
-(() => {
+document.addEventListener("DOMContentLoaded", function() {
     const postsUrl = '/api/posts'; // OK
     const commentsUrl = '/api/comments'; // /api/posts/:postId/comments/
     const commentUrl = '/api/comment'; // /api/posts/:postId/comments/:commentId
 
+    const body = document.getElementById('body');
     const feed = document.getElementById('feed');
     const createPost = document.getElementById('createPost');
     const postTextCreate = document.getElementById('postTextCreate');
@@ -21,20 +22,37 @@
     const commentTextEdit = document.getElementById('commentTextEdit');
     const commentPublishEdit = document.getElementById('commentPublishEdit');
 
+    const logout = document.getElementById('logout-box');
+
     let actualPosts = [];
 
     init();
 
     function init() {
-        fetch(postsUrl)
-            .then(response => response.json())
-            .then(response => {
-                actualPosts = response;
-                renderPosts(actualPosts);
-                renderComments(actualPosts);
-                initListeners();
-            })
-            .catch(e => console.log(e));
+        if (localStorage.getItem('token')) {
+            body.classList.remove('hide');
+
+            const apiToken = localStorage.getItem('token');
+            const headers = new Headers();
+            headers.append('Authorization', apiToken);
+
+            fetch(postsUrl, {method: 'GET', headers: headers})
+                .then(response => {
+                    if (response.status === 403) window.location = '/login';
+                    return response;
+                })
+                .then(response => response.json())
+                .then(response => {
+                    actualPosts = response;
+                    renderPosts(actualPosts);
+                    renderComments(actualPosts);
+                    initListeners();
+                })
+                .catch(e => console.log(e));
+        } else {
+            window.location = '/login'
+        }
+
     }
 
 
@@ -42,7 +60,8 @@
         feed.innerText = '';
 
         posts.forEach(post => {
-            feed.innerHTML += `<li class="rv b agz">
+            feed.innerHTML += (post.editable)
+                ? `<li class="rv b agz">
               <img class="bos vb yb aff" src="${post.author.avatar}">
               <div class="rw">
                 <div class="bpb">
@@ -66,6 +85,27 @@
                 </ul>
               </div>
             </li>`
+                : `<li class="rv b agz">
+              <img class="bos vb yb aff" src="${post.author.avatar}">
+              <div class="rw">
+                <div class="bpb">
+                  <small class="acx axc">${moment(post.publicationDate).fromNow()}</small>
+                  <h6>${post.author.name}</h6>
+                </div>
+    
+                <p>${post.text}
+                </p>
+    
+                <div class="boy" data-grid="images"><img style="display: inline-block; width: 346px; height: 335px; margin-bottom: 10px; margin-right: 0px; vertical-align: bottom;" data-width="640" data-height="640" data-action="zoom" src="${post.picture}"></div>
+                <a href="#postModalComment" class="boa" data-toggle="modal" for="comment" data-id="${post._id}">
+                    <button class="cg nz ok" data-id="${post._id}" for="comment" title="Оставить комментарий">Оставить комментарий</button>
+                </a>
+                <hr>
+                <ul class="bow afa commentBlock" id="comment-${post._id}">
+                </ul>
+              </div>
+            </li>`
+
         })
     }
 
@@ -73,38 +113,64 @@
 
         posts.forEach(post => {
             const commentBlock = document.getElementById(`comment-${post._id}`);
-            fetch(`${commentsUrl}/${post._id}`)
+
+            const apiToken = localStorage.getItem('token');
+            const headers = new Headers();
+            headers.append('Authorization', apiToken);
+
+            fetch(`${commentsUrl}/${post._id}`, {method: 'GET', headers: headers})
+                .then(response => {
+                    if (response.status === 403) window.location = '/login';
+                    return response;
+                })
                 .then(response => response.json())
                 .then(response => {
                     response
                         .forEach(comment => {
-                            commentBlock.innerHTML += `
-                              <li class="rv afh">
-                                <div class="qa">
-                                    <div class="rv">
-                                        <img class="bos us aff yb" src="${comment.user.avatar}">
-                                        <div class="rw">
-                                            <div class="bpd">
-                                                <div class="bpb">
-                                                    <small class="acx axc">${moment(comment.publicationDate).fromNow()}</small>
-                                                    <h6>${comment.user.name}</h6>
+                            commentBlock.innerHTML += (comment.editable)
+                                ? `<li class="rv afh">
+                                        <div class="qa">
+                                            <div class="rv">
+                                                <img class="bos us aff yb" src="${comment.user.avatar}">
+                                                <div class="rw">
+                                                    <div class="bpd">
+                                                        <div class="bpb">
+                                                            <small class="acx axc">${moment(comment.publicationDate).fromNow()}</small>
+                                                            <h6>${comment.user.name}</h6>
+                                                        </div>
+                                                        <div class="bpb">
+                                                        ${comment.text}
+                                                        </div>
+                                                        
+                                                        <a href="#postModalCommentEdit" class="boa" data-toggle="modal" for="edit-comment" data-id=${comment._id}>
+                                                            <button type="button" class="cg axo axu oh" data-id=${comment._id} for="edit-comment" title="Оставить комментарий">Редактировать комментарий</button>
+                                                        </a>
+                                                        <button type="button" class="close" aria-hidden="true" data-id=${comment._id} for="delete-comment" title="Удалить">
+                                                            <span class="h bbg" data-id=${comment._id} for="delete-comment"></span>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div class="bpb">
-                                                ${comment.text}
+                                            </div>
+                                        </div>
+                                      </li>`
+                                : `<li class="rv afh">
+                                    <div class="qa">
+                                        <div class="rv">
+                                            <img class="bos us aff yb" src="${comment.user.avatar}">
+                                            <div class="rw">
+                                                <div class="bpd">
+                                                    <div class="bpb">
+                                                        <small class="acx axc">${moment(comment.publicationDate).fromNow()}</small>
+                                                        <h6>${comment.user.name}</h6>
+                                                    </div>
+                                                    <div class="bpb">
+                                                    ${comment.text}
+                                                    </div>
                                                 </div>
-                                                
-                                                <a href="#postModalCommentEdit" class="boa" data-toggle="modal" for="edit-comment" data-id=${comment._id}>
-                                                    <button type="button" class="cg axo axu oh" data-id=${comment._id} for="edit-comment" title="Оставить комментарий">Редактировать комментарий</button>
-                                                </a>
-                                                <button type="button" class="close" aria-hidden="true" data-id=${comment._id} for="delete-comment" title="Удалить">
-                                                    <span class="h bbg" data-id=${comment._id} for="delete-comment"></span>
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                              </li>
-                    `
+                                  </li>`
                         });
                 })
 
@@ -118,8 +184,17 @@
         feed.addEventListener('click', publishCommentListener);
         feed.addEventListener('click', editCommentListener);
         feed.addEventListener('click', deleteCommentListener);
+        logout.addEventListener('click', logOutListener);
     }
 
+    function logOutListener(event) {
+        event.preventDefault();
+
+        localStorage.clear();
+        setTimeout(() => {
+            window.location = '/login';
+        }, 1000)
+    }
 
     function editPostListener(event) {
         if (!event.target.getAttribute("data-id") || event.target.getAttribute('for') !== 'edit') {
@@ -127,7 +202,15 @@
         }
         const id = event.target.getAttribute("data-id");
 
-        fetch(`${postsUrl}/${id}`)
+        const apiToken = localStorage.getItem('token');
+        const headers = new Headers();
+        headers.append('Authorization', apiToken);
+
+        fetch(`${postsUrl}/${id}`, {method: 'GET', headers: headers})
+            .then(response => {
+                if (response.status === 403) window.location = '/login';
+                return response;
+            })
             .then(res => res.json())
             .then(post => {
                 postTextEdit.value = post.text;
@@ -154,13 +237,20 @@
                         formData.append('picture', postImageEdit.getAttribute('src'));
                     }
 
-                    fetch(postsUrl, {
-                        method: 'PATCH',
-                        body: formData
-                    }).then(() => {
-                        postPublishEdit.removeEventListener('click', publishHandler);
-                        init();
-                    });
+                    const apiToken = localStorage.getItem('token');
+                    const headers = new Headers();
+                    headers.append('Authorization', apiToken);
+
+
+                    fetch(postsUrl, {method: 'PATCH', body: formData, headers: headers})
+                        .then(response => {
+                            if (response.status === 403) window.location = '/login';
+                            return response;
+                        })
+                        .then(() => {
+                            postPublishEdit.removeEventListener('click', publishHandler);
+                            init();
+                        });
                 };
 
                 postPublishEdit.addEventListener('click', publishHandler);
@@ -174,7 +264,15 @@
 
         const commentId = event.target.getAttribute("data-id");
 
-        fetch(`${commentUrl}/${commentId}`)
+        const apiToken = localStorage.getItem('token');
+        const headers = new Headers();
+        headers.append('Authorization', apiToken);
+
+        fetch(`${commentUrl}/${commentId}`, {method: 'GET', headers: headers})
+            .then(response => {
+                if (response.status === 403) window.location = '/login';
+                return response;
+            })
             .then(res => res.json())
             .then(comment => {
                 commentTextEdit.value = comment.text;
@@ -184,13 +282,15 @@
                     formData.append('text', commentTextEdit.value);
                     formData.append('_id', comment._id);
 
-                    fetch(commentsUrl, {
-                        method: 'PATCH',
-                        body: formData
-                    }).then(() => {
-                        commentPublishEdit.removeEventListener('click', editCommentHandler);
-                        init();
-                    });
+                    fetch(commentsUrl, {method: 'PATCH', body: formData, headers: headers})
+                        .then(response => {
+                            if (response.status === 403) window.location = '/login';
+                            return response;
+                        })
+                        .then(() => {
+                            commentPublishEdit.removeEventListener('click', editCommentHandler);
+                            init();
+                        });
                 };
 
                 commentPublishEdit.addEventListener('click', editCommentHandler);
@@ -204,7 +304,15 @@
 
         const id = event.target.getAttribute("data-id");
 
-        fetch(`${commentUrl}/${id}`, {method: 'DELETE'})
+        const apiToken = localStorage.getItem('token');
+        const headers = new Headers();
+        headers.append('Authorization', apiToken);
+
+        fetch(`${commentUrl}/${id}`, {method: 'DELETE', headers: headers})
+            .then(response => {
+                if (response.status === 403) window.location = '/login';
+                return response;
+            })
             .then(() => init())
     }
 
@@ -222,14 +330,20 @@
                 formData.append('picture', postImageCreate.getAttribute('src'));
             }
 
-            fetch(postsUrl, {
-                method: 'POST',
-                body: formData
-            }).then(() => {
-                postPublishCreate.removeEventListener('click', createHandler);
-                postTextCreate.value = '';
-                postAttachCreate.value = '';
-            });
+            const apiToken = localStorage.getItem('token');
+            const headers = new Headers();
+            headers.append('Authorization', apiToken);
+
+            fetch(postsUrl, {method: 'POST', body: formData, headers: headers})
+                .then(response => {
+                    if (response.status === 403) window.location = '/login';
+                    return response;
+                })
+                .then(() => {
+                    postPublishCreate.removeEventListener('click', createHandler);
+                    postTextCreate.value = '';
+                    postAttachCreate.value = '';
+                });
         };
         postPublishCreate.addEventListener('click', createHandler);
 
@@ -257,22 +371,23 @@
             formData.append('text', commentText.value);
             formData.append('postId', postId);
 
-            fetch(commentsUrl, {
-                method: 'POST',
-                body: formData
-            }).then(() => {
-                commentPublish.removeEventListener('click', createHandler);
-                commentText.value = '';
-                init();
-            });
+            const apiToken = localStorage.getItem('token');
+            const headers = new Headers();
+            headers.append('Authorization', apiToken);
+
+            fetch(commentsUrl, {method: 'POST', body: formData, headers: headers})
+                .then(response => {
+                    if (response.status === 403) window.location = '/login';
+                    return response;
+                })
+                .then(() => {
+                    commentPublish.removeEventListener('click', createHandler);
+                    commentText.value = '';
+                    init();
+                });
         };
 
         commentPublish.addEventListener('click', createHandler);
 
     }
-
-    function recreateNode(el) {
-        let new_element = el.cloneNode(true);
-        el.parentNode.replaceChild(new_element, el);
-    }
-})();
+});
