@@ -1,27 +1,10 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const postsUrl = '/api/posts'; // OK
     const commentsUrl = '/api/comments'; // /api/posts/:postId/comments/
     const commentUrl = '/api/comment'; // /api/posts/:postId/comments/:commentId
 
     const body = document.getElementById('body');
     const feed = document.getElementById('feed');
-    const createPost = document.getElementById('createPost');
-    const postTextCreate = document.getElementById('postTextCreate');
-    const postAttachCreate = document.getElementById('postAttachCreate');
-    const postImageCreate = document.getElementById('postImageCreate');
-    const postPublishCreate = document.getElementById('postPublishCreate');
-
-    const postTextEdit = document.getElementById('postTextEdit');
-    const postAttachEdit = document.getElementById('postAttachEdit');
-    const postImageEdit = document.getElementById('postImageEdit');
-    const postPublishEdit = document.getElementById('postPublishEdit');
-
-    const commentText = document.getElementById('commentText');
-    const commentPublish = document.getElementById('commentPublish');
-
-    const commentTextEdit = document.getElementById('commentTextEdit');
-    const commentPublishEdit = document.getElementById('commentPublishEdit');
-
     const logout = document.getElementById('logout-box');
 
     let actualPosts = [];
@@ -110,7 +93,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function renderComments(posts) {
-
         posts.forEach(post => {
             const commentBlock = document.getElementById(`comment-${post._id}`);
 
@@ -175,17 +157,148 @@ document.addEventListener("DOMContentLoaded", function() {
                 })
 
         })
-
     }
 
     function initListeners() {
-        createPost.addEventListener('click', createPostListener);
+        document.getElementById('postModalCreate').addEventListener('click', postModalCreateListener);
+        document.getElementById('postModalEdit').addEventListener('click', postModalEditListener);
+        document.getElementById('createPost').addEventListener('click', createPostListener);
+        document.getElementById('postModalComment').addEventListener('click', postModalCommentListener);
+        document.getElementById('postModalCommentEdit').addEventListener('click', postModalCommentEditListener);
+
         feed.addEventListener('click', editPostListener);
         feed.addEventListener('click', deletePostListener);
         feed.addEventListener('click', publishCommentListener);
         feed.addEventListener('click', editCommentListener);
         feed.addEventListener('click', deleteCommentListener);
         logout.addEventListener('click', logOutListener);
+    }
+
+    function postModalCreateListener(e) {
+        if (!(e.target.id === 'postModalCreate')) return;
+
+        e.target.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="d">
+                        <h4 class="modal-title" id="postTitleCreate">Create post</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+
+                    <div class="modal-body afx">
+                        <div class="axw">
+                            <ul class="bow cj ca">
+                                <li class="b">
+                                    <textarea type="text" class="form-control" placeholder="Message" id="postTextCreate"></textarea>
+                                </li>
+                                <li class="b">
+                                    <img style="display: inline-block; width: 208px; height: 201px; margin-bottom: 10px; margin-right: 0px; vertical-align: bottom;" src="https://via.placeholder.com/346x335.png" id="postImageCreate">
+                                </li>
+                                <li class="b">
+                                    <input type="file" class="form-control" placeholder="Message" id="postAttachCreate">
+                                </li>
+                                <li class="b">
+                                    <button class="cg nz ok" id="postPublishCreate" data-dismiss="modal">Опубликовать</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('createPost').addEventListener('click', createPostListener);
+    }
+
+    function postModalEditListener(e) {
+        if (!(e.target.id === 'postModalEdit')) return;
+
+        e.target.innerHTML = `<div class="modal-dialog">
+        <div class="modal-content">
+            <div class="d">
+                <h4 class="modal-title" id="postTitleEdit">Edit post</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+
+            <div class="modal-body afx">
+                <div class="axw">
+                    <ul class="bow cj ca">
+                        <li class="b">
+                            <textarea type="text" class="form-control" placeholder="Message" id="postTextEdit"></textarea>
+                        </li>
+                        <li class="b">
+                            <img
+                                    style="display: inline-block; width: 208px; height: 201px; margin-bottom: 10px; margin-right: 0px; vertical-align: bottom;"
+                                    src="/assets/img/instagram_3.jpg"
+                                    id="postImageEdit"
+                            >
+                        </li>
+                        <li class="b">
+                            <input type="file" class="form-control" placeholder="Message" id="postAttachEdit">
+                        </li>
+                        <li class="b">
+                            <button class="cg nz ok" id="postPublishEdit" data-dismiss="modal">Опубликовать</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>`;
+        feed.addEventListener('click', editPostListener);
+    }
+
+    function postModalCommentListener(e) {
+        if (!(e.target.id === 'postModalComment')) return;
+
+        e.target.innerHTML = `<div class="modal-dialog">
+        <div class="modal-content">
+            <div class="d">
+                <h4 class="modal-title">Создать комментарий</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+
+            <div class="modal-body afx">
+                <div class="axw">
+                    <ul class="bow cj ca">
+                        <li class="b">
+                            <textarea type="text" class="form-control" placeholder="Message" id="commentText"></textarea>
+                        </li>
+                        <li class="b">
+                            <button class="cg nz ok" id="commentPublish" data-dismiss="modal">Опубликовать</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+        feed.addEventListener('click', publishCommentListener);
+    }
+
+    function postModalCommentEditListener(e) {
+        if (!(e.target.id === 'postModalCommentEdit')) return;
+
+        e.target.innerHTML = `<div class="modal-dialog">
+        <div class="modal-content">
+            <div class="d">
+                <h4 class="modal-title">Редактировать комментарий</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+
+            <div class="modal-body afx">
+                <div class="axw">
+                    <ul class="bow cj ca">
+                        <li class="b">
+                            <textarea type="text" class="form-control" placeholder="Message" id="commentTextEdit"></textarea>
+                        </li>
+                        <li class="b">
+                            <button class="cg nz ok" id="commentPublishEdit" data-dismiss="modal">Опубликовать</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>`;
+        feed.addEventListener('click', editCommentListener);
     }
 
     function logOutListener(event) {
@@ -201,6 +314,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!event.target.getAttribute("data-id") || event.target.getAttribute('for') !== 'edit') {
             return;
         }
+
+        const postTextEdit = document.getElementById('postTextEdit');
+        const postAttachEdit = document.getElementById('postAttachEdit');
+        const postImageEdit = document.getElementById('postImageEdit');
+        const postPublishEdit = document.getElementById('postPublishEdit');
+
         const id = event.target.getAttribute("data-id");
 
         const apiToken = localStorage.getItem('token');
@@ -281,6 +400,9 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        const commentTextEdit = document.getElementById('commentTextEdit');
+        const commentPublishEdit = document.getElementById('commentPublishEdit');
+
         const commentId = event.target.getAttribute("data-id");
 
         const apiToken = localStorage.getItem('token');
@@ -336,6 +458,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function createPostListener() {
+        const postTextCreate = document.getElementById('postTextCreate');
+        const postAttachCreate = document.getElementById('postAttachCreate');
+        const postImageCreate = document.getElementById('postImageCreate');
+        const postPublishCreate = document.getElementById('postPublishCreate');
+
         postImageCreate.setAttribute('src', 'https://via.placeholder.com/346x335.png');
 
         const createHandler = () => {
@@ -382,6 +509,9 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!event.target.getAttribute("data-id") || event.target.getAttribute('for') !== 'comment') {
             return;
         }
+
+        const commentText = document.getElementById('commentText');
+        const commentPublish = document.getElementById('commentPublish');
 
         const postId = event.target.getAttribute("data-id");
 
