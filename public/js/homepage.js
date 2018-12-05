@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const postsUrl = '/api/posts'; // OK
+    const userProfileUrl = '/api/user-profile';
+    const likesUrl = '/api/likes'; // OK
     const commentsUrl = '/api/comments'; // /api/posts/:postId/comments/
     const commentUrl = '/api/comment'; // /api/posts/:postId/comments/:commentId
 
@@ -7,17 +9,37 @@ document.addEventListener("DOMContentLoaded", function () {
     const feed = document.getElementById('feed');
     const logout = document.getElementById('logout-box');
 
+    const profileFullName = document.getElementById('profile');
+    const profileUrls = document.getElementsByClassName('profile-url');
+    const profileImg = document.getElementById('profile-img');
+    const profileDescription = document.getElementById('profile-description');
+
+
+
     let actualPosts = [];
 
     init();
 
     function init() {
-        if (localStorage.getItem('token')) {
+        if (localStorage.getItem('token') || localStorage.getItem('current_user_id')) {
             body.classList.remove('hide');
 
             const apiToken = localStorage.getItem('token');
+            const currentUserId = localStorage.getItem('current_user_id');
+
             const headers = new Headers();
             headers.append('Authorization', apiToken);
+
+            fetch(`${userProfileUrl}/${currentUserId}`,{method: 'GET', headers: headers})
+                .then(response => {
+                    if (response.status === 403) window.location = '/login';
+                    return response;
+                })
+                .then(response => response.json())
+                .then(response => {
+                    let userProfile = response;
+                    renderUserProfile(userProfile);
+                });
 
             fetch(postsUrl, {method: 'GET', headers: headers})
                 .then(response => {
@@ -32,6 +54,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     initListeners();
                 })
                 .catch(e => console.log(e));
+
+
         } else {
             window.location = '/login'
         }
@@ -56,14 +80,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 </p>
     
                 <div class="boy" data-grid="images"><img style="display: inline-block; width: 346px; height: 335px; margin-bottom: 10px; margin-right: 0px; vertical-align: bottom;" data-width="640" data-height="640" data-action="zoom" src="${post.picture}"></div>
-                <a href="#postModalEdit" class="boa" data-toggle="modal" for="edit" data-id="${post._id}">
-                    <button class="cg nz ok" data-id="${post._id}" for="edit" title="Редактировать пост">Редактировать пост</button>
-                </a>
-                <a href="#postModalComment" class="boa" data-toggle="modal" for="comment" data-id="${post._id}">
-                    <button class="cg nz ok" data-id="${post._id}" for="comment" title="Оставить комментарий">Оставить комментарий</button>
-                </a>
-                <button type="button" class="close" aria-hidden="true" title="Удалить" data-id="${post._id}" for="delete"><span data-id="${post._id}" for="delete" class="h bbg"></span></button>
+                
+                <button class="cg ${post.isLiked ? 'nq' : 'ns'}" type="button" for="like" data-id="${post._id}">
+                  <span class="h bmc" for="like" data-id="${post._id}"></span>
+                  ${post.isLiked ? 'Liked!' : 'Like'}
+                </button>
+                <button class="cg nq" type="button" >
+                  <span class="h bnc"></span>
+                  ${post.numberOfLikes ? post.numberOfLikes : 0}
+                </button>
                 <hr>
+                <p>
+                
+                    <a href="#postModalEdit" class="boa" data-toggle="modal" for="edit" data-id="${post._id}">
+                        <button class="cg nz ok" data-id="${post._id}" for="edit" title="Редактировать пост">
+                            <span class="h bit"></span> Редактировать пост
+                        </button>
+                    </a>
+                    
+                    <a href="#postModalComment" class="boa" data-toggle="modal" for="comment" data-id="${post._id}">
+                        <button class="cg nz ok" data-id="${post._id}" for="comment" title="Оставить комментарий">
+                            <span class="h bmv"></span> Оставить комментарий
+                        </button>
+                    </a>
+                    <a class="boa" for="delete" data-id="${post._id}">
+                        <button type="button" class="close" aria-hidden="true" title="Удалить" data-id="${post._id}" for="delete"><span data-id="${post._id}" for="delete" class="h bbg"></span></button>
+                    </a>
+                    
+                </p>
                 <ul class="bow afa commentBlock" id="comment-${post._id}">
                 </ul>
               </div>
@@ -80,15 +124,39 @@ document.addEventListener("DOMContentLoaded", function () {
                 </p>
     
                 <div class="boy" data-grid="images"><img style="display: inline-block; width: 346px; height: 335px; margin-bottom: 10px; margin-right: 0px; vertical-align: bottom;" data-width="640" data-height="640" data-action="zoom" src="${post.picture}"></div>
-                <a href="#postModalComment" class="boa" data-toggle="modal">
-                    <button class="cg nz ok" data-id="${post._id}" for="comment" title="Оставить комментарий">Оставить комментарий</button>
-                </a>
+                
+                <button class="cg ${post.isLiked ? 'nq' : 'ns'}" type="button" for="like" data-id="${post._id}">
+                  <span class="h bmc" for="like" data-id="${post._id}"></span>
+                  ${post.isLiked ? 'Liked!' : 'Like'}
+                </button>
+                <button class="cg nq" type="button">
+                  <span class="h bnc"></span>
+                  ${post.numberOfLikes ? post.numberOfLikes : 0}
+                </button>
                 <hr>
+                <p>
+                    <a href="#postModalComment" class="boa" data-toggle="modal" for="comment" data-id="${post._id}">
+                        <button class="cg nz ok" data-id="${post._id}" for="comment" title="Оставить комментарий">
+                            <span class="h bmv"></span> Оставить комментарий
+                        </button>
+                    </a>
+                    
+                </p>
                 <ul class="bow afa commentBlock" id="comment-${post._id}">
                 </ul>
               </div>
             </li>`
 
+        })
+    }
+
+    function renderUserProfile(profile) {
+
+        profileFullName.innerText = `${profile.firstName} ${profile.lastName}`;
+        profileDescription.innerText = profile.description;
+        profileImg.setAttribute('src', profile.avatarUrl);
+        Array.prototype.forEach.call(profileUrls, (link) => {
+            link.setAttribute('href', `/profile?id=${profile._id}`);
         })
     }
 
@@ -168,6 +236,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         feed.addEventListener('click', editPostListener);
         feed.addEventListener('click', deletePostListener);
+        feed.addEventListener('click', likePostListener);
         feed.addEventListener('click', publishCommentListener);
         feed.addEventListener('click', editCommentListener);
         feed.addEventListener('click', deleteCommentListener);
@@ -375,6 +444,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 postPublishEdit.addEventListener('click', publishHandler);
             })
+    }
+
+    function likePostListener(event) {
+        if (!event.target.getAttribute("data-id") || event.target.getAttribute('for') !== 'like') {
+            return;
+        }
+        const id = event.target.getAttribute("data-id");
+
+        const apiToken = localStorage.getItem('token');
+        const headers = new Headers();
+        headers.append('Authorization', apiToken);
+
+        let formData = new FormData();
+        formData.append('postId', id);
+
+        fetch(`${likesUrl}`, {method: 'POST',  body: formData, headers: headers})
+            .then(response => {
+                if (response.status === 403) window.location = '/login';
+                return response;
+            })
+            .then(() => init())
     }
 
     function deletePostListener(event) {

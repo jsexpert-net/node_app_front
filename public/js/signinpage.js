@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     growl.appendChild(growlBody);
 
                     localStorage.setItem('token', response.token);
+                    localStorage.setItem('current_user_id', response.userId);
 
                     setTimeout(() => {
                         window.location = '/';
