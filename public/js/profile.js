@@ -11,6 +11,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const profileEmail = document.getElementById('profile-email');
     const profileFirstName = document.getElementById('profile-first-name');
     const profileLastName = document.getElementById('profile-last-name');
+    const postsNumber = document.getElementById('profile-posts-number');
+    const commentsNumber = document.getElementById('profile-comments-number');
+    const likesNumber = document.getElementById('profile-likes-number');
+    const commentsAVG = document.getElementById('profile-comments-avg');
+
+
     const editBlock = document.getElementById('edit-block');
     const viewBlock = document.getElementById('view-block');
     const editBtn = document.getElementById('edit-button');
@@ -33,6 +39,10 @@ document.addEventListener("DOMContentLoaded", function() {
         profileEmail.innerText = profile.email;
         profileFirstName.innerText = profile.firstName;
         profileLastName.innerText = profile.lastName;
+        postsNumber.innerText = profile.postsNumber;
+        likesNumber.innerText = profile.likesNumber;
+        commentsNumber.innerText = profile.commentsNumber;
+        commentsAVG.innerText = profile.commentsAVG;
 
     }
 
@@ -84,7 +94,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 return response;
             })
             .then((response) => {
-                console.log(response);
                 showView();
                 getProfileData();
             });
