@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
               <div class="rw">
                 <div class="bpb">
                   <small class="acx axc">${moment(post.publicationDate).fromNow()}</small>
-                  <h6>${post.author.fullName}</h6>
+                  <h6><a href="/profile?id=${post.author._id}">${post.author.fullName}</a></h6>
                 </div>
     
                 <p>${post.text}
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
               <div class="rw">
                 <div class="bpb">
                   <small class="acx axc">${moment(post.publicationDate).fromNow()}</small>
-                  <h6>${post.author.fullName}</h6>
+                  <h6><a href="/profile?id=${post.author._id}">${post.author.fullName}</a></h6>
                 </div>
     
                 <p>${post.text}
@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                                     <div class="bpd">
                                                         <div class="bpb">
                                                             <small class="acx axc">${moment(comment.publicationDate).fromNow()}</small>
-                                                            <h6>${comment.user.fullName}</h6>
+                                                            <h6><a href="/profile?id=${comment.user._id}">${comment.user.fullName}</a></h6>
                                                         </div>
                                                         <div class="bpb">
                                                         ${comment.text}
@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                                 <div class="bpd">
                                                     <div class="bpb">
                                                         <small class="acx axc">${moment(comment.publicationDate).fromNow()}</small>
-                                                        <h6>${comment.user.fullName}</h6>
+                                                        <h6><a href="/profile?id=${comment.user._id}">${comment.user.fullName}</a></h6>
                                                     </div>
                                                     <div class="bpb">
                                                     ${comment.text}

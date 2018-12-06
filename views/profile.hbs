@@ -63,7 +63,7 @@
                 <a class="pg" href="/">Home <span class="adt">(current)</span></a>
               </li>
               <li class="pi active">
-                <a class="pg" href="/profile">Profile</a>
+                <a class="pg" id="profile-link">Profile</a>
               </li>
               <li class="pi vm">
                 <a class="pg" href="/notifications">Notifications</a>
@@ -104,12 +104,11 @@
     <div class="pz bpi afo">
         <div class="qf" style="background-image: url(/assets/img/iceland.jpg);"></div>
         <div class="qa avz">
-            <a href="/profile?id=1" class="profile-url">
                 <img class="bpj" id="profile-img" src="/assets/img/avatar-dhg.png">
-            </a>
+
 
             <h6 class="qb">
-                <a class="boa profile-url" href="/profile?id=1" id="profile"></a>
+                <span id="profile"></span>
             </h6>
 
             <p class="afo" id="profile-description"></p>
@@ -119,7 +118,7 @@
     <div class="pz vp vy afo" id="view-block">
         <div class="qa qqq">
             <h6 class="afh">About
-                <small>· <a href="#" id="edit-button">Edit</a></small>
+                <small>&nbsp;&nbsp;&nbsp; <a href="#" id="edit-button">Edit</a></small>
             </h6>
             <ul class="dc axg">
                 <li><span class="axc h bnb aff"></span><strong>Login: </strong><span id="profile-login"></span></li>

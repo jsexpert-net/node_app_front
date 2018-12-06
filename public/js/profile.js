@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const commentsNumber = document.getElementById('profile-comments-number');
     const likesNumber = document.getElementById('profile-likes-number');
     const commentsAVG = document.getElementById('profile-comments-avg');
+    const profileLink = document.getElementById('profile-link');
 
 
     const editBlock = document.getElementById('edit-block');
@@ -43,7 +44,10 @@ document.addEventListener("DOMContentLoaded", function() {
         likesNumber.innerText = profile.likesNumber;
         commentsNumber.innerText = profile.commentsNumber;
         commentsAVG.innerText = profile.commentsAVG;
-
+        profileLink.setAttribute('src', `/profile/${profile._id}`);
+        if (!profile.editable) {
+            editBtn.classList.add('hide');
+        }
     }
 
     function initListeners() {
